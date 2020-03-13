@@ -4,7 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "migrate": "node-pg-migrate"
+    "start": "COOKIE_SECRET=bad_secret PGUSER=postgres PGDATABASE=countryFacts npx nodemon ./src/index.js",
+    "migrate": "DATABASE_URL=postgres://postgres@localhost:5432/countryFacts node-pg-migrate",
+
+    "db:create": "npx createdbjs countryFacts",
+    "db:drop": "npx dropdbjs countryFacts || true",
+    "db:reset": "yarn db:drop && yarn db:create && yarn migrate up"
   },
   "dependencies": {
     "apollo-server": "^2.11.0",
