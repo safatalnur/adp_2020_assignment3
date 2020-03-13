@@ -9,11 +9,22 @@ const typeDefs = gql `
         "All countries"
         countries: [Country!] 
 
+        "All facts"
+        facts: [Fact!]
     }
+
 
     type Country {
         id: ID!
         name: String!
+    }
+
+    type Fact {
+        id: ID!
+        capital: String!
+        population: String!
+        area: String!
+        homeCountry: Country!
     }
 `;
 
@@ -26,8 +37,22 @@ const resolvers = {
         return results.rows
         },
 
+        facts: async () => {
+          const results = await pool.query(`
+              SELECT * FROM facts
+          `)
+          return results.rows
+          }
     },
 
+    Fact: {
+     homeCountry: async (source) =>{
+         const results = await pool.query(`
+             SELECT * FROM countries WHERE ID = $1
+         `, [source.home_country_id])
+     return results.rows[0]
+     }
+ }
 }
 
 const server = new ApolloServer({
