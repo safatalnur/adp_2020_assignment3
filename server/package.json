@@ -2,5 +2,19 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^2.11.0",
+    "connect-pg-simple": "^6.1.0",
+    "cors": "^2.8.5",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "graphql": "^14.6.0",
+    "migrate": "^1.6.2",
+    "node-pg-migrate": "^4.2.2",
+    "nodemon": "^2.0.2",
+    "pg": "^7.18.2",
+    "pgtools": "^0.3.0"
+  }
 }
