@@ -15,25 +15,25 @@ const typeDefs = gql `
         "All languages"
         languages: [Language!]
     }
-
     type Language {
         id: ID!
         name: String!
     }
-
-    type Country {
-        id: ID!
-        name: String!
-        homeLanguage: Language!
-    }
-
     type Fact {
         id: ID!
         capital: String!
         population: String!
         area: String!
-        homeCountry: Country!
+        # homeCountry: Country!
     }
+
+    type Country {
+        id: ID!
+        name: String!
+        homeCountryFact: Fact!
+        homeLanguage: Language!
+    }
+
 `;
 
 const resolvers = {
@@ -46,12 +46,12 @@ const resolvers = {
         },
 
         facts: async () => {
-          const results = await pool.query(`
-              SELECT * FROM facts
-          `)
-          return results.rows
-          },
-        
+            const results = await pool.query(`
+                SELECT * FROM facts
+            `)
+        return results.rows
+        },
+
         languages: async () => {
             const results = await pool.query(`
                 SELECT * FROM languages
@@ -60,24 +60,30 @@ const resolvers = {
         }
     },
 
-    Fact: {
-        homeCountry: async (source) =>{
-            const results = await pool.query(`
-                SELECT * FROM countries WHERE ID = $1
-                `, [source.home_country_id])
-        return results.rows[0]
-        }
-    },
-    
+    // Fact: {
+    //     homeCountry: async (source) =>{
+    //         const results = await pool.query(`
+    //             SELECT * FROM countries WHERE ID = $1
+    //         `, [source.home_country_id])
+    //     return results.rows[0]
+    //     },
+    // },
+
     Country: {
         homeLanguage: async (source) =>{
             const results = await pool.query(`
                 SELECT * FROM languages WHERE ID = $1
             `, [source.home_language_id])
         return results.rows[0]
-        },        
+        },
+        homeCountryFact: async (source) =>{
+            const results = await pool.query(`
+                SELECT * FROM facts WHERE ID = $1
+            `, [source.home_country_fact_id])
+        return results.rows[0]
+        },
+        
     }
-
 }
 
 const server = new ApolloServer({
