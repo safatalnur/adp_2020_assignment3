@@ -3,9 +3,29 @@
 exports.shorthands = undefined;
 
 exports.up = pgm => {
+
+    pgm.createTable('languages', {
+      id: 'id',
+      name: {type: 'text', notNull: true},
+  
+    createdAt: {
+      type: 'timestamp',
+      notNull: true,
+      default: pgm.func('current_timestamp'),
+
+    },
+    })
+
+
     pgm.createTable('countries', {
       id: 'id',
       name: {type: 'text', notNull: true},
+      home_language_id: {
+        type: 'int',
+        notNull: true,
+        references: 'languages',
+        onDelete: 'cascade',
+      },
     
     createdAt: {
       type: 'timestamp',
@@ -35,28 +55,52 @@ exports.up = pgm => {
    })
 
     pgm.sql(`
-      INSERT INTO countries (name)
+
+    INSERT INTO languages (name)
+    VALUES
+        ('English'),
+        ('French'),
+        ('Korean'),
+        ('Deutsch'),
+        ('Mandarin'),
+        ('Russian'),
+        ('Arabic'),
+        ('Italian'),
+        ('Bengali'),
+        ('Malay'),
+        ('Japanese'),
+        ('Cantonese'),
+        ('Spanish'),
+        ('Hindi'); 
+
+      INSERT INTO countries (
+        name,
+        home_language_id
+      )
         VALUES
-          ('Canada'),
-          ('Bangladesh'),
-          ('Australia'),
-          ('United States of America'),
-          ('Mexico'),
-          ('United Kingdom'),
-          ('France'),
-          ('Germany'),
-          ('China'),
-          ('Japan'),
-          ('South Korea'),
-          ('Saudia Arabia'),
-          ('United Arab Emirates'),
-          ('Russia'),
-          ('South Africa'),
-          ('Morocco'),
-          ('Italy'),
-          ('India'),
-          ('Egypt'),
-          ('Indonesia');
+          ('Canada', 1),
+          ('Canada', 2),
+          ('Bangladesh', 9),
+          ('Australia', 1),
+          ('United States of America', 1),
+          ('Mexico', 13),
+          ('United Kingdom', 1),
+          ('France', 2),
+          ('Germany', 4),
+          ('China', 5),
+          ('China', 12),
+          ('Japan', 11),
+          ('South Korea', 3),
+          ('Saudia Arabia', 7),
+          ('United Arab Emirates', 7),
+          ('Russia', 6),
+          ('South Africa', 1),
+          ('Morocco', 7),
+          ('Italy', 8),
+          ('India', 14),
+          ('India', 1),
+          ('Egypt', 7),
+          ('Indonesia', 10);
       
      INSERT INTO facts (
           capital,
