@@ -15,6 +15,29 @@ const typeDefs = gql `
         "All languages"
         languages: [Language!]
     }
+
+    type Mutation {
+        createFact(input: CreateFactInput!):Fact!
+        createLanguage(input: CreateLanguageInput!):Language!
+        createCountry(input: CreateCountryInput!):Country!
+    }
+
+    input CreateCountryInput {
+        name: String!
+        homeCountryFact: ID!
+        homeLanguage: ID!
+    }
+
+    input CreateFactInput {
+        capital: String!
+        population: String!
+        area: String!
+    }
+
+    input CreateLanguageInput {
+        name: String!
+    }
+
     type Language {
         id: ID!
         name: String!
@@ -60,15 +83,6 @@ const resolvers = {
         }
     },
 
-    // Fact: {
-    //     homeCountry: async (source) =>{
-    //         const results = await pool.query(`
-    //             SELECT * FROM countries WHERE ID = $1
-    //         `, [source.home_country_id])
-    //     return results.rows[0]
-    //     },
-    // },
-
     Country: {
         homeLanguage: async (source) =>{
             const results = await pool.query(`
@@ -81,9 +95,49 @@ const resolvers = {
                 SELECT * FROM facts WHERE ID = $1
             `, [source.home_country_fact_id])
         return results.rows[0]
-        },
+        }, 
+    },
+
+    Mutation: {
+        createFact: async (source, args) => {
+            const { capital, population, area } = args.input
+      
+            const results = await pool.query(`
+              INSERT INTO facts (capital, population, area)
+              VALUES 
+                ($1, $2, $3)
+              RETURNING *
+            `, [capital, population, area])
+      
+            return results.rows[0]
+          },
+
+        createLanguage: async (source, args) => {
+            const { name } = args.input
+      
+            const results = await pool.query(`
+              INSERT INTO languages (name)
+              VALUES 
+                ($1)
+              RETURNING *
+            `, [name])
+      
+            return results.rows[0]
+          },    
         
-    }
+          createCountry: async (source, args) => {
+            const { name, homeCountryFact, homeLanguage } = args.input
+      
+            const results = await pool.query(`
+              INSERT INTO countries (name, home_country_fact_id, home_language_id)
+              VALUES 
+                ($1, $2, $3)
+              RETURNING *
+            `, [name, homeCountryFact, homeLanguage])
+      
+            return results.rows[0]
+          },      
+    },
 }
 
 const server = new ApolloServer({
